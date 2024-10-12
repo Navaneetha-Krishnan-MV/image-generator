@@ -1,25 +1,44 @@
-import logo from './logo.svg';
+// src/App.js
+import React, { useState } from 'react';
+import { query } from './api';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [prompt, setPrompt] = useState('');
+    const [imageSrc, setImageSrc] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const image = await query({ "inputs": prompt });
+            setImageSrc(image);
+        } catch (error) {
+            console.error('Error fetching image:', error);
+        }
+
+        setLoading(false);
+    };
+
+    return (
+        <div className="App">
+            <h1>Generate Image from Prompt</h1>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Enter a prompt"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    required
+                />
+                <button className='button-85' type="submit">Generate Image</button>
+            </form>
+            {loading && <p>Loading...</p>}
+            {imageSrc && <img src={imageSrc} alt="Generated result" />}
+        </div>
+    );
 }
 
 export default App;
